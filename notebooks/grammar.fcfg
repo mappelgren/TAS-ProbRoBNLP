@@ -1,0 +1,48 @@
+
+## DRT OG grammar
+## 
+## Author: Mattias Appelgren 
+## URL: <http://www.mappelgren.co.uk>
+
+
+% start S
+############################
+# Grammar Rules
+#############################
+
+S[SEM = <app(?subj,?pd)>] -> RefExp[NUM=?n,SEM=?subj] BE[NUM=?n] PropDef[SEM=?pd]
+
+S[SEM=?np] -> VP[NUM=?n] NPP[NUM=?n, SEM=?np]
+
+#NP[NUM=?n,SEM=<app(?det,?nom)> ] -> Det[NUM=?n,SEM=?det]  Nom[NUM=?n,SEM=?nom]
+#Nom[NUM=?n,SEM=?nom] -> N[NUM=?n,SEM=?nom]
+
+#RefExp[Num=?n, SEM=]
+
+NPP[NUM=?n, SEM=<app(?np, ?pp)>] -> NP[NUM=?n,SEM=?np] PP[SEM=?pp]
+
+NP[NUM=?n,SEM=<app(?det, ?np)>] -> Det[NUM=?n,SEM=?det] N[NUM=?n,SEM=?np]
+
+PP[SEM=<app(?p, ?loc)>] -> P[SEM=?p] LOC[SEM=?loc]
+
+VP[NUM=?n] -> 'there' BE[NUM=?n]
+
+LOC[SEM=<vector(0, 0, 0)>] -> 'the' 'centre'
+
+#############################
+# Lexical Rules
+#############################
+
+Det[NUM=sg,SEM=<\P Q.((DRS([x],[])+P(x))+Q(x))>] -> 'a' | 'A'
+The -> 'the'
+N[NUM=sg,SEM=<\x.DRS([],[table(x)])>] -> 'table'
+N[NUM=pl,SEM=<\x.DRS([],[table(x)])>] -> 'tables' 
+
+BE[NUM=sg] -> 'is'
+BE[NUM=pl] -> 'are'
+
+THERE -> 'there'
+#CENTRE -> 'centre'
+
+P[SEM=<\y x.(DRS([], [on(x, y)]))>] -> 'in' | 'on' 
+
