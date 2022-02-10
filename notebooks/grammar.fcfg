@@ -35,8 +35,8 @@ LOC[SEM=<vector(0, 0, 0)>] -> 'the' 'centre'
 
 Det[NUM=sg,SEM=<\P Q.((DRS([x],[])+P(x))+Q(x))>] -> 'a' | 'A'
 The -> 'the'
-N[NUM=sg,SEM=<\x.DRS([],[table(x)])>] -> 'table'
-N[NUM=pl,SEM=<\x.DRS([],[table(x)])>] -> 'tables' 
+N[NUM=sg,SEM=<\x.DRS([],[Table(x)])>] -> 'table'
+N[NUM=pl,SEM=<\x.DRS([],[Table(x)])>] -> 'tables' 
 
 BE[NUM=sg] -> 'is'
 BE[NUM=pl] -> 'are'
