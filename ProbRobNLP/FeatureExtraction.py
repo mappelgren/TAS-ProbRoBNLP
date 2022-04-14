@@ -19,7 +19,8 @@ def get_words_and_tags(sentence):
         dep = token['dep']
         pos = token['pos']
         head = token['head']
-        yield {'id': i, 'word': word, 'tag': tag, 'dep': dep, 'pos': pos, 'head': head}
+
+        yield {'id': i, 'word': word, 'tag': tag, 'dep': dep, 'pos': pos, 'head': head, 'ref': {}, 'word_positions': [i]}
 
 
 def get_potential_referents(sentence):
@@ -154,13 +155,19 @@ def feature_vector(antecedent, target):
         "word_overlap": word_overlap_match(antecedent, target),
         "edit_distance": edit_distance(list_to_string(antecedent), list_to_string(target)),
         "ant_definite": definiteness(antecedent),
-        "tar_defnite": definiteness(target),
+        "tar_definite": definiteness(target),
         "proper_noun": proper_noun(antecedent) == proper_noun(target),
         "pronoun_antecedent": pronoun(antecedent),
         "pronoun_target": pronoun(target),
         "subject": subject(target) == subject(antecedent),
+        "subject_target": subject(target),
+        "subject_antecedent": subject(antecedent),
         "direct_object": direct_object(target) == direct_object(antecedent),
+        "direct_object_antecedent": direct_object(antecedent),
+        "direct_object_target": direct_object(target),
         "indirect_object": dative(target) == dative(antecedent),
+        "indirect_object_target": dative(target),
+        "indirect_object_antecedent": dative(antecedent),
         "number_match": number_match(antecedent, target),
     }
     # TODO gender, Animacy, Quotation Semantic featuers

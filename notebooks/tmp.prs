@@ -1,0 +1,3 @@
+from model import *
+x0 = Table with color "blue", on Vector3D(0, 0, 0)
+x3 = Tray on x0, with color "green"

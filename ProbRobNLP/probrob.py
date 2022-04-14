@@ -350,7 +350,10 @@ class Entity:
         self.constraints.append(constraint)
 
     def __repr__(self):
-        constraint_repr = " " + ', '.join([con.__repr__() for con in self.constraints])
+        if len(self.constraints) > 0:
+            constraint_repr = " " + ', '.join([str(con) for con in self.constraints])
+        else:
+            constraint_repr = ""
 
         return f"{self.name} = {self.type}" + constraint_repr
 

@@ -1,0 +1,4 @@
+from model import *
+x0 = Table on Vector3D(0, 0, 0)
+x3 = Tray on x0, with color "0.3"
+x6 = Cube on x3
