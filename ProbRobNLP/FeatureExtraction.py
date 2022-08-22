@@ -1,5 +1,7 @@
 import spacy
 
+from ProbRobNLP import logic
+
 
 def get_words_and_tags(sentence):
     """ Parses the sentence using Spacy
@@ -46,27 +48,27 @@ def list_to_string(word_list):
     return ' '.join([w['word'] for w in word_list])
 
 
-def exact_string_match(entity1, entity2):
+def exact_string_match(entity1: str, entity2: str):
     """Checks if two strings are the same"""
-    return list_to_string(entity1).lower() == list_to_string(entity2).lower()
+    return entity1.lower() == entity2.lower()
 
 
-def sub_string_match(antecedent, target):
+def sub_string_match(antecedent: str, target: str):
     """Checks if the target is represented in the antecedent"""
-    return list_to_string(target).lower() in list_to_string(antecedent).lower()
+    return target.lower() in antecedent.lower()
 
 
-def word_overlap_match(antecedent, target):
+def word_overlap_match(antecedent: str, target: str):
     """Checks if any of the words in the target are in the antecedent"""
-    antecedent = list_to_string(antecedent).lower()
+    antecedent = antecedent.lower()
 
-    for word in target:
+    for word in target.split():
         if word['word'].lower() in antecedent:
             return True
     return False
 
 
-def levenshtein(s1, s2):
+def levenshtein(s1: str, s2: str):
     """Given the levenshtein distance between two strings"""
     if len(s1) < len(s2):
         return levenshtein(s2, s1)
@@ -97,15 +99,15 @@ def edit_distance(antecedent, target, threshold=2):
 list_of_definites = ["his", "her", "my", "your", "its", "our", "their", "this", "these", "that", "those", "the"]
 
 
-def definiteness(antecedent, definites=list_of_definites):
+def definiteness(antecedent: str, definites=list_of_definites):
     """Checks if the entity is a definite as defined by the list of definites"""
-    words = [a['word'].lower() for a in antecedent]
+    words = [a.lower() for a in antecedent.split()]
     return any([definite in words for definite in definites])
 
 
-def proper_noun(entity):
-    """Checks if the entity is a proper noun"""
-    return all([word['pos'] == "PROPN" for word in entity])
+# def proper_noun(entity: logic.Term):
+#     """Checks if the entity is a proper noun"""
+#     return all([word['pos'] == "PROPN" for word in entity])
 
 
 def pronoun(entity):
@@ -172,3 +174,10 @@ def feature_vector(antecedent, target):
     }
     # TODO gender, Animacy, Quotation Semantic featuers
 
+
+def coreference_features(antecedent: logic.Term, target: logic.Term):
+    return {
+        "exact_match": exact_string_match(antecedent.get_feature('words'), target.get_feature('words')),
+        "substring_match": sub_string_match(antecedent.get_feature('words'), target.get_feature('words')),
+        "direct_object_antecedent": antecedent.get_feature('dobj')
+    }

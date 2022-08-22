@@ -1,0 +1,58 @@
+elif word['tag'] == 'DT':
+        #     if word['word'] == 'a':
+        #         constant = get_reference()
+        #         constant.update_features({
+        #             'words': [word['word']],
+        #             'positions': [word['word_positions']],
+        #             'number': 1, })
+        #         word['sem'] = DRSish([constant], [])
+        #     elif word['word'] == 'the':
+        #         variable = get_variable()
+        #         variable.update_features({
+        #             'words': [word['word']],
+        #             'positions': [word['word_positions']],
+        #         })
+        #         word['sem'] = DRSish([variable], [])
+        
+         elif word['tag'] in ['NN', 'JJ']:
+            variable = get_variable()
+            variable.update_features({
+                'words': [word['word']],
+                'positions': [word['word_positions']],
+            })
+                        elif word['word'] in ['that']:
+
+
+            if word['tag'] == 'NN':
+                variable.update_features({'number': 1})
+
+            if word['dep'] == 'dobj':
+                variable.update_features({'dobj': True})
+
+            p = logic.Predicate(word['word'], 1)
+            a = logic.Atom(p, [variable])
+            word['sem'] = DRSish([variable], [a])
+            
+             elif word['tag'] == 'IN':
+            x = get_variable()
+            y = get_variable()
+            e = get_event()
+            p = logic.Predicate(word['word'], 3)
+            a = logic.Atom(p, [e, x, y], fp=True)
+            word['sem'] = DRSish([e, x, y], [a], holes={'control': (x, None), 'pobj': (y, None)})
+            
+            
+ elif word['tag'] == 'VB':
+            e = get_event()
+            x = get_variable()
+            e_prim = get_event()
+            p = logic.Predicate(word['word'], 3)
+            a = logic.Atom(p, [e, x, e_prim])
+            word['sem'] = DRSish([e], [a], holes={'dobj': (x, None), 'prep': (e_prim, ('control', x))})
+        elif word['tag'] == 'PRP':
+            x = get_variable()
+            x.update_features({
+                'words': [word['word']],
+                'positions': [word['word_positions']],
+            })
+            word['sem'] = DRSish([x], [])
