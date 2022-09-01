@@ -1,4 +1,4 @@
 from model import *
 x0 = Table with color "blue", on Vector3D(0, 0, 0)
 x1 = Tray on x0, with color "green"
-x2 = Tray left of x1, with color "red", on x0
+x2 = Tray on x0, with color "red", left of x1

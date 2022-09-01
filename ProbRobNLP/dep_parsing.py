@@ -54,8 +54,7 @@ class Sentence:
             return default
 
     def join(self, head_id, child_id):
-        """Combines the entry of two entries at head_id and child_id
-        """
+        """Combines the entry of two entries at head_id and child_id"""
         head = self.sentence[head_id]
         child = self.sentence[child_id]
 
@@ -79,7 +78,14 @@ class Sentence:
                 word['head'] = head['id']
 
 
-
+"""Define multiword expressions here
+The format is a dictionary where the key is a tuple containing the words of the multi word expression
+and the value is a tuple with three entries:
+1) a function which returns a semantic representation (a DRSish instance)
+2) the number of arguments to the function where the arguments represent the referents in the DRS 
+    (these are there to know how many variables to generate and pass to the function when the multiword expression is created 
+3) the position of the HEAD word of the multiword expression. This will inform what the dependency for the expression is
+"""
 multiword_expressions = {
     ('the', 'centre'): (lambda: DRSish([logic.Atom(logic.Predicate('Vector3D', 3), [0, 0, 0])], []), 0, 1),
     ('to', 'the', 'left', 'of'): (
@@ -92,7 +98,9 @@ multiword_expressions = {
     0)}
 
 
-def combine_multword_expression(sentence, expression, start_location):
+def combine_multword_expression(sentence: Sentence, expression, start_location):
+    """Once a multiword expression is found this function will update the sentence datastructure to combine the
+        multiword expression into a single entry in the dictionary. """
     words = [sentence[i] for i in range(start_location, start_location + len(expression))]
     heads = [w['head'] for w in words]
     leaves = [w for w in words if w['id'] not in heads]
@@ -105,7 +113,9 @@ def combine_multword_expression(sentence, expression, start_location):
     return sentence, [words[0]]
 
 
-def match_multiword_expression(sentence, multiword_expression, semantics):
+def match_multiword_expression(sentence: Sentence, multiword_expression, semantics):
+    """Goes over the sentence and finds any instances of a particular multi word expression
+        Then adds the semantics of that multiword expression to the entry"""
     drs_lambda, num_variables, head_position = semantics
     for i in range(len(sentence)):
         if all([sentence.get(i + j, {}).get('word', '') == word for j, word in enumerate(multiword_expression)]):
@@ -125,13 +135,16 @@ def match_multiword_expression(sentence, multiword_expression, semantics):
 
 
 class SubstitutionRule:
-
+    """A substitution rule has a function that checks whether the rule applies to a particular word
+        and a function which returns the semantics of the corresponding word"""
     def __init__(self, name, checking_function, semantics_function):
         self.name = name
         self.checking_function = checking_function
         self.semantics_function = semantics_function
 
     def applies(self, id_, word, sentence):
+        """Word here is an entry from the Sentence which is equivalent to the get_words_and_tags function
+        i.e. it is a dictionary which includes POS-tag, dependency tag, etc"""
         return self.checking_function(id_, word, sentence)
 
     def apply(self, id_, word, sentence):
@@ -151,6 +164,11 @@ class RulesGroup:
             if (sem := rule.apply(id_, word, sentence)) is not None:
                 return sem
 
+"""Here follows a number of functions for checking rules and returning semantics. 
+A rule checker requires three arguments: id (the position of the word in the sentence), word, sentence
+
+A semantics function requires a single argument: the word being added (note that word here represents a dictionary 
+    as returned from the get_words_and_tags function) """
 
 def check_det(det):
     def det_checker(id_, word, sentence):
@@ -258,6 +276,9 @@ def word_checker(word):
         return w['word'] == word
     return check_word
 
+
+
+""" This rule group represents the different entries in our grammar. """
 substitution_rules = RulesGroup(
     [SubstitutionRule('a', check_det('a'), a_sem),
      SubstitutionRule('the', check_det('the'), the_sem),
@@ -274,6 +295,8 @@ substitution_rules = RulesGroup(
 
 
 def substitution(sentence):
+    """The purpose of the substitution step is to give each word in a sentence a partial semantic representation.
+    These will later be combined together to represent the semantics of the sentence. """
     for expression, semantics in multiword_expressions.items():
         sentence = match_multiword_expression(sentence, expression, semantics)
 
@@ -285,7 +308,8 @@ def substitution(sentence):
 
     return sentence
 
-
+"""These are combination rules. The purpose of these rules is to decide how, given a particular dependency label, 
+to combine the head and child of the dependency. """
 rules = {'amod': lambda head, child: head.join_on_reference(child),
          'det': lambda head, child: child.join_on_reference(head),
          'pobj': lambda head, child: head.fill_gap(child, 'pobj'),
@@ -296,6 +320,7 @@ rules = {'amod': lambda head, child: head.join_on_reference(child),
 
 
 def compose(sentence, position):
+    """Given a particular position in the sentence, combine the word at that position with its dependency head. """
     child = sentence.sentence[position]
     head_id = child['head']
     head = sentence.sentence[head_id]
@@ -313,6 +338,8 @@ def compose(sentence, position):
 
 
 def parse_sentence(s, verbose=False):
+    """This function takes a sentence, substitutes the words with smaller semantic forms, and then combines these
+    smaller words together using the dependency combination rules above until only a single entry remains, which will contains the semantics of the entire sentence.The"""
     s = Sentence(s)
     if verbose:
         print('Sentence:')

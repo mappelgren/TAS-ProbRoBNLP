@@ -96,14 +96,14 @@ class Dialogue:
 
     def get_candidates(self, reference):
         constraints = [a for a in self.current_state.get_first_predicates(reference) if a.pred.arity == 1]
-        print(constraints)
-        print(self.current_state)
-        print(self.current_state.ref)
+        # print(constraints)
+        # print(self.current_state)
+        # print(self.current_state.ref)
         possible_candidates = [ref for ref in self.current_state.ref if ref != reference
                                and isinstance(ref, logic.Constant) and (reference.is_event() == ref.is_event())]
-        print(possible_candidates)
-        for ref in possible_candidates:
-            print(ref, self.current_state.test_reference_matches(ref, constraints))
+        # print(possible_candidates)
+        # for ref in possible_candidates:
+        #     print(ref, self.current_state.test_reference_matches(ref, constraints))
         candidates = [ref for ref in possible_candidates if self.current_state.test_reference_matches(ref, constraints)]
         return candidates
 
@@ -138,12 +138,12 @@ class Dialogue:
         unresolved = [r for r in self.current_state.ref if isinstance(r, logic.Variable)]
         if len(unresolved) > 0:
 
-            print('unresolved', unresolved)
+            # print('unresolved', unresolved)
 
             for r in unresolved:
                 candidates = self.get_candidates(r)
 
-                print('candidates', candidates)
+                # print('candidates', candidates)
                 if len(candidates) == 1:
                     replacement = candidates[0]
                     self.current_state.replace_reference(r, replacement)
@@ -172,7 +172,7 @@ class Dialogue:
                                     best_candidate_time = time_diff
                                     best_candidate_features = features
 
-                    print(best_candidate, r)
+                    # print(best_candidate, r)
                     self.current_state.replace_reference(r, best_candidate)
                     self.dialogue_history.add_reference(best_candidate)
                     # self.dialogue_history[-1][1]['ref'][best_candidate] = self.dialogue_history[-1][1]['ref'][r]
